@@ -59,4 +59,4 @@ else:
 
 Employee  = id, name, salary
 
-select top(4) from Employee 
+# select top(4) from Employee 
