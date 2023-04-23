@@ -1,5 +1,9 @@
+.DS_Store
 *.out
 *.exe
 *.o
 *.bin
 */*.out
+*/*/.idea
+CPP/GlfwProject/build/*
+CPP/GlfwProject/external/*

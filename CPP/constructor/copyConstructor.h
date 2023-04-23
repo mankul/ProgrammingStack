@@ -19,6 +19,7 @@ class CopyConstructor{
 		CopyConstructor(const CopyConstructor & );
 		void operator delete (void * pointer);
 		void operator delete [] (void * pointer);
+		CopyConstructor operator= (const CopyConstructor &);
 
 };
 
