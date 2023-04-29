@@ -4,6 +4,7 @@
 *.o
 *.bin
 */*.out
+*/*.*.out
 */*/.idea
 CPP/GlfwProject/build/*
 CPP/GlfwProject/external/*
