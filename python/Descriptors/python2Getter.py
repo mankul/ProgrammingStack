@@ -37,6 +37,7 @@ class RevealAccess(object):
     """
 
     def __init__(self, initval=None, name='var'):
+	print("Instance initialized")
         self.val = initval
         self.name = name
 
@@ -52,8 +53,13 @@ class MyClass(object):
     x = RevealAccess(10, 'var "x"')
     y = 5
 
+
 m = MyClass()
-print(m.x)
+
+# Getter will be called.
+print(m.x) 
+
+# setter will be called.
 m.x = 25
 newM = MyClass()
 print(newM.x)

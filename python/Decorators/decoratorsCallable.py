@@ -27,6 +27,9 @@ class Memoize:
 def getResourceManager(key):
     print("get Rersource manager")
 
+# getResourceManager = Memoize(getResourceManager(key))
+# now getResourceManager will be called and __call__ function will be invoked.
+
 
 
 memzo = getResourceManager(10)

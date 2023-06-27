@@ -20,6 +20,13 @@ def function1(listOfNumbers):
     print("sum is ", sum)
     # return sum
 
+# the function is converted to
+# function1 = loggingWithArgument("myfunction", count)(function1(listOfNumbers)
+# now the above will be written as
+# function1 = loggingWithArgument.wrapper(func) , where func = function1(listOfNumbers)
+# function1 = logginWithArgument.wrapper.wrapped_function(listOfNumbers)
+
+
 
 def logging(func):
     def wrapped_logging(* args, ** kargs):
