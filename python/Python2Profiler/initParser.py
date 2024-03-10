@@ -9,10 +9,10 @@ class InitVisitor(ast.NodeVisitor):
         self.initModules=[]
 
     def visit_Import(self, node) -> Any:
-        return super().visit_Import(node)
+        # now we have the location of the import package
     
     def visit_ImportFrom(self, node) -> Any:
-        return super().visit_ImportFrom(node)
+        # we have the path to the directory which have init file in which we have the 
 
 
 
@@ -20,3 +20,4 @@ class InitVisitor(ast.NodeVisitor):
 with open(filePath, 'r') as r:
     code = r.read()
 syntaxTree  = ast.parse(code)
+``
