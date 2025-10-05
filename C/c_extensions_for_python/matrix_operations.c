@@ -80,37 +80,78 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
-// Matrix multiplication function
-static PyObject* matrix_multiplication(PyObject* self, PyObject* args) 
-{
-    PyObject *matrix1_obj, *matrix2_obj;
 
+int parse_matrices(PyObject* args, PyArrayObject *matrix1, PyArrayObject *matrix2, int *rows1, int *cols1, int *rows2, int *cols2) {
+    PyObject *matrix1_obj, *matrix2_obj;
     if (!PyArg_ParseTuple(args, "OO", &matrix1_obj, &matrix2_obj)) {
-        return NULL;
+        return 0;
     }
 
-    PyArrayObject *matrix1 = (PyArrayObject *)PyArray_FROM_OTF(matrix1_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
-    PyArrayObject *matrix2 = (PyArrayObject *)PyArray_FROM_OTF(matrix2_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
-
+    matrix1 = (PyArrayObject *)PyArray_FROM_OTF(matrix1_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+    matrix2 = (PyArrayObject *)PyArray_FROM_OTF(matrix2_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
     if (!matrix1 || !matrix2) {
         Py_XDECREF(matrix1);
         Py_XDECREF(matrix2);
         PyErr_SetString(PyExc_TypeError, "Invalid NumPy arrays.");
-        return NULL;
+        return 0;
     }
 
     if (PyArray_NDIM(matrix1) != 2 || PyArray_NDIM(matrix2) != 2) {
         Py_DECREF(matrix1);
         Py_DECREF(matrix2);
         PyErr_SetString(PyExc_TypeError, "Inputs must be 2D arrays.");
-        return NULL;
+        return 0;
     }
 
-    int rows1 = PyArray_DIM(matrix1, 0);
-    int cols1 = PyArray_DIM(matrix1, 1);
-    int rows2 = PyArray_DIM(matrix2, 0);
-    int cols2 = PyArray_DIM(matrix2, 1);
+    int rows1_val = PyArray_DIM(matrix1, 0);
+    int cols1_val = PyArray_DIM(matrix1, 1);
+    int rows2_val = PyArray_DIM(matrix2, 0);
+    int cols2_val = PyArray_DIM(matrix2, 1);
+    rows1 = &rows1_val;
+    cols1 = &cols1_val;
+    rows2 = &rows2_val;
+    cols2 = &cols2_val;
+    return 1;
+}
 
+
+// Matrix multiplication function
+static PyObject* matrix_multiplication(PyObject* self, PyObject* args) 
+{
+    PyObject *matrix1_obj, *matrix2_obj;
+
+    // if (!PyArg_ParseTuple(args, "OO", &matrix1_obj, &matrix2_obj)) {
+    //     return NULL;
+    // }
+
+    // PyArrayObject *matrix1 = (PyArrayObject *)PyArray_FROM_OTF(matrix1_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+    // PyArrayObject *matrix2 = (PyArrayObject *)PyArray_FROM_OTF(matrix2_obj, NPY_DOUBLE, NPY_ARRAY_IN_ARRAY);
+
+    // if (!matrix1 || !matrix2) {
+    //     Py_XDECREF(matrix1);
+    //     Py_XDECREF(matrix2);
+    //     PyErr_SetString(PyExc_TypeError, "Invalid NumPy arrays.");
+    //     return NULL;
+    // }
+
+    // if (PyArray_NDIM(matrix1) != 2 || PyArray_NDIM(matrix2) != 2) {
+    //     Py_DECREF(matrix1);
+    //     Py_DECREF(matrix2);
+    //     PyErr_SetString(PyExc_TypeError, "Inputs must be 2D arrays.");
+    //     return NULL;
+    // }
+
+    // int rows1 = PyArray_DIM(matrix1, 0);
+    // int cols1 = PyArray_DIM(matrix1, 1);
+    // int rows2 = PyArray_DIM(matrix2, 0);
+    // int cols2 = PyArray_DIM(matrix2, 1);
+    PyArrayObject *matrix1, *matrix2;
+    int rows1, cols1, rows2, cols2;
+    int res = parse_matrices(args, matrix1, matrix2, &rows1, &cols1, &rows2, &cols2);
+    if(res == 0)
+    {
+        return NULL; // Error in parsing matrices
+    }
     if (cols1 != rows2) {
         Py_DECREF(matrix1);
         Py_DECREF(matrix2);
@@ -130,6 +171,40 @@ static PyObject* matrix_multiplication(PyObject* self, PyObject* args)
                 sum += a * b;
             }
             *(double *)PyArray_GETPTR2(result, i, j) = sum;
+        }
+    }
+
+    Py_DECREF(matrix1);
+    Py_DECREF(matrix2);
+
+    return PyArray_Return(result);
+}
+
+
+
+
+static PyObject* matrix_addition(PyObject* self, PyObject* args) 
+{
+    PyArrayObject *matrix1 ;
+    PyArrayObject *matrix2 ;
+    int rows1, cols1, rows2, cols2;
+    int res = parse_matrices(args, matrix1, matrix2, &rows1, &cols1, &rows2, &cols2);
+    if (res == 0)
+        return NULL; // Error in parsing matrices
+
+    if (cols1 != cols2 && rows1 != rows2) {
+        Py_DECREF(matrix1);
+        Py_DECREF(matrix2);
+        PyErr_SetString(PyExc_ValueError, "Incompatible dimensions for Addition.");
+        return NULL;
+    }
+
+    npy_intp dims[2] = {rows1, cols2};
+    PyArrayObject *result = (PyArrayObject *)PyArray_ZEROS(2, dims, NPY_DOUBLE, 0);
+
+    for (int i = 0; i < rows1; ++i) {
+        for (int j = 0; j < cols2; ++j) {
+            *(double *)PyArray_GETPTR2(result, i, j) = *(double *)PyArray_GETPTR2(matrix1, i, j) + *(double *)PyArray_GETPTR2(matrix2, i, j);
         }
     }
 
