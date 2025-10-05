@@ -14,3 +14,4 @@ CPP/GlfwProject/external/*
 */build/*
 C/c_extensions_for_python/build
 *.so
+*.pyc
